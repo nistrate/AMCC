@@ -9,7 +9,7 @@ int Trig = A1;
 
 
 #define RightBackIO 3
-#define RightBackA 2
+#define RightBackA 8
 #define RightBackB 10
 
 #define FrontIO 7
@@ -30,8 +30,9 @@ Servo myservo;  // create servo object to control a servo
 
 //SR04 sr04 = SR04(ECHO_PIN,TRIG_PIN); // create distance sensor object
 long a;         // variable to store the distance in cm
-int speed = 100; // controls speed of back motors
-int thresholdDistance = 35; //cm
+int speed = 120; // controls speed of back motors
+int thresholdDistance = 50; //cm
+int turn_dur = 1200; //ms duration turn
 
 ///////////////////////////////
 
@@ -146,18 +147,34 @@ void loop() {
     servoPosition = newServoPosition;
     delay(1000);
 
-    if ( (rightDistance > leftDistance) || (rightDistance > thresholdDistance) )
-    {
+    if ( (rightDistance > leftDistance) && (rightDistance > thresholdDistance) )
+    { 
+      newServoPosition = 180;
+      moveFromToAngle(servoPosition, newServoPosition);
+      servoPosition = newServoPosition;
+      delay(250);
       car.PowerFront(HIGH);
       car.PowerBack(HIGH,HIGH);
-      car.rightForwardTurn(1000);
+      car.rightForwardTurn(turn_dur);
+      newServoPosition = 90;
+      moveFromToAngle(servoPosition, newServoPosition);
+      servoPosition = newServoPosition;
+      delay(250);
     }
-    else if ((rightDistance < leftDistance)||(leftDistance > thresholdDistance)){
+    else if ((rightDistance < leftDistance) && (leftDistance > thresholdDistance)){
+      newServoPosition = posLow;
+      moveFromToAngle(servoPosition, newServoPosition);
+      servoPosition = newServoPosition;
+      delay(250);
       car.PowerFront(HIGH);
       car.PowerBack(HIGH,HIGH);
-      car.leftForwardTurn(1000);
+      car.leftForwardTurn(turn_dur);
+      newServoPosition = 90;
+      moveFromToAngle(servoPosition, newServoPosition);
+      servoPosition = newServoPosition;
+      delay(250);
     }
-    else if ( (rightDistance <= thresholdDistance) || (leftDistance <= thresholdDistance)){
+    else if ( (rightDistance <= thresholdDistance) && (leftDistance <= thresholdDistance)){
       car.PowerBack(HIGH,HIGH);
       car.backward(1000, speed);
     }
